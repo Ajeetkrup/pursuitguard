@@ -2330,7 +2330,7 @@
       renderTechnicalTimeline(activeNode);
     }
 
-    function renderCountPills(pinned, evMap) {
+    function renderCountPills(pinned, evMap, discrepancies = [], hitlDecisions = {}) {
       if (!pinned.length) {
         verdictCounts.hidden = true;
         verdictCounts.replaceChildren();
@@ -2339,22 +2339,39 @@
 
       let met = 0;
       let notMet = 0;
-      let review = 0;
+      let unverifiable = 0;
       let waived = 0;
       pinned.forEach((req) => {
         const st = effectiveRequirementStatus(req, evMap[req.req_id]);
         if (st === "PASSED") met += 1;
         else if (st === "FAILED") notMet += 1;
-        else if (st === "UNVERIFIABLE_NEEDS_HUMAN") review += 1;
+        else if (st === "UNVERIFIABLE_NEEDS_HUMAN") unverifiable += 1;
         else if (st === "WAIVED_BY_HUMAN") waived += 1;
       });
 
+      const pendingConflicts = (discrepancies || []).filter(
+        (d) => !(hitlDecisions || {})[d.discrepancy_id]
+      ).length;
+
       const items = [
-        { icon: "check", text: `${met} Met`, cls: met > 0 ? "count-met" : "" },
-        { icon: "x", text: `${notMet} Not met`, cls: notMet > 0 ? "count-blocker" : "" },
-        { icon: "alert", text: `${review} Needs review`, cls: review > 0 ? "count-review" : "" },
-        { icon: "diamond", text: `${waived} Waived`, cls: waived > 0 ? "count-waived" : "" }
+        { icon: "check", text: `${met} Met`, cls: met > 0 ? "count-met" : "" }
       ];
+      if (notMet > 0 || (pendingConflicts === 0 && unverifiable === 0 && waived === 0)) {
+        items.push({ icon: "x", text: `${notMet} Not met`, cls: notMet > 0 ? "count-blocker" : "" });
+      }
+      if (unverifiable > 0) {
+        items.push({ icon: "alert", text: `${unverifiable} Unverifiable`, cls: "count-review" });
+      }
+      if (pendingConflicts > 0) {
+        items.push({
+          icon: "alert",
+          text: `${pendingConflicts} ${pendingConflicts === 1 ? "Data conflict" : "Data conflicts"}`,
+          cls: "count-review"
+        });
+      }
+      if (waived > 0) {
+        items.push({ icon: "diamond", text: `${waived} Waived`, cls: "count-waived" });
+      }
 
       const frag = document.createDocumentFragment();
       items.forEach((item) => {
@@ -2374,11 +2391,22 @@
       const meta = VERDICT_META[sc.verdict] || { label: sc.verdict };
       const rfpTitle = rfpSelect.options[rfpSelect.selectedIndex]?.textContent || "Selected solicitation";
       const wsLabel = wsSelect.options[wsSelect.selectedIndex]?.textContent || state.workspace_id || "";
+      const hitlDecisions = state.hitl_decisions || {};
+      const pendingConflicts = (state.discrepancies || []).filter(
+        (d) => !hitlDecisions[d.discrepancy_id]
+      ).length;
+      const countSummary = [
+        `Met ${sc.requirements_passed}`,
+        `Not met ${sc.requirements_failed}`,
+        `Unverifiable ${sc.requirements_unverifiable}`,
+        `Waived ${sc.requirements_waived}`,
+        ...(pendingConflicts > 0 ? [`Data conflicts ${pendingConflicts}`] : [])
+      ].join(" | ");
       const lines = [
         `PursuitGuard Bid Recommendation: ${meta.label} (${String(sc.confidence || "").toLowerCase()} confidence)`,
         `Solicitation: ${rfpTitle}`,
         `Workspace: ${wsLabel}`,
-        `Summary counts: Met ${sc.requirements_passed} | Not met ${sc.requirements_failed} | Needs review ${sc.requirements_unverifiable} | Waived ${sc.requirements_waived}`,
+        `Summary counts: ${countSummary}`,
         "",
         sc.summary || ""
       ];
@@ -2433,7 +2461,7 @@
       const evMap = state.evidence_by_id || {};
 
       verdictBanner.className = "verdict-banner is-updated";
-      renderCountPills(pinned, evMap);
+      renderCountPills(pinned, evMap, state.discrepancies || [], state.hitl_decisions || {});
 
       if (state.what_if_assumptions?.length) {
         assumptionsBar.textContent = "";

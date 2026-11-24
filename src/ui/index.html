@@ -1,0 +1,3007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <title>PursuitGuard: AEC Pursuit Qualification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #ffffff;
+      --rail: #f6f8fa;
+      --wash: #edf1f5;
+      --ink: #0f2236;
+      --ink-2: #33485e;
+      --muted: #5c7085;
+      --rule: #dde4ec;
+      --control-border: #c4d0dd;
+      --accent: #0c5a60;
+      --accent-hover: #084348;
+      --accent-tint: #e8f5f6;
+      --accent-rule: #79b4ba;
+      --go: #0d6847;
+      --go-tint: #eaf7f1;
+      --go-rule: #8fd4b6;
+      --hold: #8f4b06;
+      --hold-tint: #fef6e7;
+      --hold-rule: #e6a952;
+      --nogo: #a61b22;
+      --nogo-tint: #fdf0f0;
+      --nogo-rule: #e5969a;
+      --shadow-xs: 0 1px 2px rgba(15, 34, 54, 0.05);
+      --shadow-sm: 0 2px 8px rgba(15, 34, 54, 0.06);
+      --font-display: "Plus Jakarta Sans", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: "Plus Jakarta Sans", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: "IBM Plex Mono", "Cascadia Mono", "Consolas", ui-monospace, monospace;
+      --scrollbar-thumb: #6f8296;
+      --scrollbar-track: var(--rail);
+      accent-color: var(--accent);
+    }
+
+    * { box-sizing: border-box; }
+
+    ::selection {
+      background: #cbe9ec;
+      color: var(--ink);
+    }
+
+    html {
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-family: var(--font-body);
+      font-size-adjust: from-font;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.55;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Compact single-row top frame */
+    .topbar {
+      flex: 0 0 auto;
+      border-top: 3px solid var(--accent);
+      border-bottom: 1px solid var(--rule);
+      background: var(--paper);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #ffffff;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 1px 2px rgba(12, 90, 96, 0.25);
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .brand-scope {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      padding-left: 10px;
+      border-left: 1px solid var(--rule);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-inline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .ui-icon {
+      display: inline-block;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+
+    .btn-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 19px;
+      height: 19px;
+      margin-left: 2px;
+      padding: 0 5px;
+      border-radius: 4px;
+      background: var(--wash);
+      border: 1px solid var(--rule);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-2);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Asymmetric 2-zone Architectural Specification Desk */
+    .desk {
+      display: grid;
+      grid-template-columns: 396px minmax(0, 1fr);
+      flex: 1 1 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .solicitation-rail {
+      background: var(--rail);
+      border-right: 1px solid var(--rule);
+      padding: 22px 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+      scrollbar-width: thin;
+    }
+
+    .qualification-desk {
+      background: var(--paper);
+      padding: 26px 34px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      min-width: 0;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+      scrollbar-width: thin;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+      }
+      .desk {
+        grid-template-columns: 1fr;
+        flex: none;
+        overflow: visible;
+      }
+      .solicitation-rail {
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+        overflow: visible;
+      }
+      .qualification-desk {
+        overflow: visible;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .qualification-desk {
+        padding: 18px 16px 28px;
+      }
+    }
+
+    .section-heading {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      text-wrap: balance;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    label,
+    .field-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink-2);
+    }
+
+    .field-hint {
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    select,
+    textarea,
+    input[type="text"] {
+      width: 100%;
+      background: var(--paper);
+      color: var(--ink);
+      border: 1px solid var(--control-border);
+      border-radius: 6px;
+      padding: 8px 11px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      box-shadow: var(--shadow-xs);
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    select:hover:not(:disabled),
+    textarea:hover:not(:disabled),
+    input[type="text"]:hover:not(:disabled) {
+      border-color: #8fa3b8;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--muted);
+      opacity: 1;
+    }
+
+    select:disabled,
+    input[type="text"]:disabled,
+    textarea:disabled {
+      background: var(--wash);
+      color: var(--muted);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    textarea {
+      min-height: 220px;
+      resize: vertical;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .mode-toggle {
+      display: inline-flex;
+      border: 1px solid var(--control-border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--paper);
+      box-shadow: var(--shadow-xs);
+    }
+
+    .mode-btn {
+      border: none;
+      border-radius: 0;
+      padding: 4px 11px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background: var(--paper);
+      color: var(--ink-2);
+      box-shadow: none;
+    }
+
+    .mode-btn + .mode-btn {
+      border-left: 1px solid var(--control-border);
+    }
+
+    .mode-btn:hover:not(:disabled) {
+      background: var(--wash);
+      color: var(--ink);
+    }
+
+    .mode-btn.is-active,
+    .mode-btn.is-active:hover:not(:disabled) {
+      background: var(--accent-tint);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .rfp-preview {
+      min-height: 220px;
+      max-height: 360px;
+      overflow-y: auto;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+      scrollbar-width: thin;
+      background: var(--paper);
+      color: var(--ink);
+      border: 1px solid var(--control-border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      line-height: 1.55;
+      box-shadow: var(--shadow-xs);
+      transition: border-color 0.15s ease;
+    }
+
+    .rfp-preview[hidden],
+    textarea[hidden] {
+      display: none;
+    }
+
+    .rfp-preview:hover {
+      border-color: #8fa3b8;
+    }
+
+    .rfp-preview:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .rfp-preview h1,
+    .rfp-preview h2,
+    .rfp-preview h3 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      line-height: 1.3;
+      text-wrap: balance;
+    }
+
+    .rfp-preview h1 {
+      font-size: 14.5px;
+      font-weight: 700;
+    }
+
+    .rfp-preview h2 {
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 12px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .rfp-preview h3 {
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    .rfp-preview p {
+      margin: 0 0 8px;
+      color: var(--ink-2);
+    }
+
+    .rfp-preview ul,
+    .rfp-preview ol {
+      margin: 4px 0 10px;
+      padding-left: 18px;
+      color: var(--ink-2);
+    }
+
+    .rfp-preview li {
+      margin-bottom: 5px;
+    }
+
+    .rfp-preview strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .rfp-preview em {
+      font-style: italic;
+    }
+
+    .rfp-preview code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--wash);
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    .rfp-preview hr {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 10px 0;
+    }
+
+    .rfp-preview > :last-child {
+      margin-bottom: 0;
+    }
+
+    .rfp-empty {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    button {
+      background: var(--accent);
+      color: #ffffff;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    button:disabled {
+      opacity: 0.52;
+      cursor: not-allowed;
+    }
+
+    button.primary-full {
+      width: 100%;
+      padding: 11px 16px;
+      font-size: 13.5px;
+      font-weight: 700;
+      box-shadow: 0 1px 3px rgba(12, 90, 96, 0.22);
+    }
+
+    button.secondary {
+      background: var(--paper);
+      color: var(--ink);
+      border: 1px solid var(--control-border);
+      box-shadow: var(--shadow-xs);
+    }
+
+    button.secondary:hover:not(:disabled) {
+      background: var(--wash);
+      border-color: #8fa3b8;
+    }
+
+    button.chip {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--paper);
+      color: var(--ink-2);
+      border: 1px solid var(--control-border);
+      box-shadow: none;
+    }
+
+    button.chip:hover:not(:disabled) {
+      background: var(--accent-tint);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .whatif-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .rail-divider {
+      border-top: 1px solid var(--rule);
+      padding-top: 16px;
+      margin-top: 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Centerpiece: Bid Recommendation Banner */
+    .verdict-banner {
+      border: 1px solid var(--rule);
+      background: var(--rail);
+      border-radius: 8px;
+      padding: 22px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .verdict-banner.banner-GO {
+      border-color: var(--go-rule);
+      background: var(--go-tint);
+    }
+
+    .verdict-banner.banner-CONDITIONAL_GO,
+    .verdict-banner.banner-HITL_REQUIRED {
+      border-color: var(--hold-rule);
+      background: var(--hold-tint);
+    }
+
+    .verdict-banner.banner-NO_GO {
+      border-color: var(--nogo-rule);
+      background: var(--nogo-tint);
+    }
+
+    .verdict-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .verdict-kicker {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .verdict-tag {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 30px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-top: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-wrap: balance;
+    }
+
+    .v-GO { color: var(--go); }
+    .v-CONDITIONAL_GO, .v-HITL_REQUIRED { color: var(--hold); }
+    .v-NO_GO { color: var(--nogo); }
+
+    .verdict-conf {
+      padding: 5px 11px;
+      border-radius: 6px;
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-2);
+    }
+
+    .verdict-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .copy-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .copy-btn {
+      min-inline-size: 24px;
+      min-block-size: 24px;
+      padding: 5px 11px;
+      font-size: 12px;
+    }
+
+    .copy-btn[data-copied] {
+      border-color: var(--go-rule);
+      color: var(--go);
+      background: var(--go-tint);
+    }
+
+    .copy-btn[data-failed] {
+      border-color: var(--nogo-rule);
+      color: var(--nogo);
+      background: var(--nogo-tint);
+    }
+
+    .copy-tip {
+      position: absolute;
+      inset-block-start: calc(100% + 5px);
+      inset-inline-end: 0;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 5;
+    }
+
+    .copy-btn[data-copied] + .copy-tip,
+    .copy-btn[data-failed] + .copy-tip {
+      opacity: 1;
+    }
+
+    .verdict-counts {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .verdict-counts[hidden],
+    .assumptions-bar[hidden],
+    .live-status[hidden],
+    .copy-btn[hidden] {
+      display: none;
+    }
+
+    .count-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-2);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .count-pill.count-met {
+      border-color: var(--go-rule);
+      color: var(--go);
+    }
+
+    .count-pill.count-blocker {
+      border-color: var(--nogo-rule);
+      background: var(--nogo-tint);
+      color: var(--nogo);
+    }
+
+    .count-pill.count-review {
+      border-color: var(--hold-rule);
+      background: var(--hold-tint);
+      color: var(--hold);
+    }
+
+    .count-pill.count-waived {
+      border-color: var(--accent-rule);
+      background: var(--accent-tint);
+      color: var(--accent);
+    }
+
+    .assumptions-bar {
+      padding: 9px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--accent-rule);
+      background: var(--paper);
+      font-size: 12.5px;
+      color: var(--ink-2);
+    }
+
+    .assumptions-bar strong {
+      color: var(--accent);
+    }
+
+    .verdict-summary {
+      font-size: 14px;
+      color: var(--ink-2);
+      max-width: 72ch;
+      line-height: 1.58;
+    }
+
+    .verdict-summary p,
+    .req-summary p {
+      margin: 0 0 8px;
+      text-wrap: pretty;
+    }
+
+    .req-summary p {
+      margin-bottom: 4px;
+    }
+
+    .verdict-summary > :last-child,
+    .req-summary > :last-child {
+      margin-bottom: 0;
+    }
+
+    .verdict-summary ul,
+    .verdict-summary ol,
+    .req-summary ul,
+    .req-summary ol {
+      margin: 4px 0 8px;
+      padding-left: 18px;
+    }
+
+    .verdict-summary li,
+    .req-summary li {
+      margin-bottom: 3px;
+    }
+
+    .verdict-summary strong,
+    .req-summary strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .verdict-summary code,
+    .req-summary code,
+    .hitl-item code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: rgba(15, 34, 54, 0.08);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--ink);
+    }
+
+    .verdict-guardrails {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(15, 34, 54, 0.14);
+      font-size: 12.5px;
+      color: var(--ink-2);
+    }
+
+    .verdict-guardrails-label {
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .verdict-guardrails ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .verdict-guardrails li {
+      margin-bottom: 3px;
+    }
+
+    /* Compact Horizontal 4-Step End-User Progress Rail */
+    .pipeline-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background: var(--rule);
+      overflow: hidden;
+      box-shadow: var(--shadow-xs);
+    }
+
+    @media (max-width: 680px) {
+      .timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    .live-status {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .step-item {
+      padding: 10px 12px;
+      background: var(--paper);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .step-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .step-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      border: 1px solid var(--control-border);
+      background: var(--rail);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .step-item.active {
+      background: var(--accent-tint);
+      box-shadow: inset 0 -2px 0 var(--accent);
+    }
+
+    .step-item.active .step-dot {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .step-item.paused {
+      background: var(--hold-tint);
+      box-shadow: inset 0 -2px 0 var(--hold-rule);
+    }
+
+    .step-item.paused .step-dot {
+      background: var(--hold);
+      border-color: var(--hold);
+      color: #ffffff;
+    }
+
+    .step-item.done {
+      background: var(--go-tint);
+    }
+
+    .step-item.done .step-dot {
+      background: var(--go);
+      border-color: var(--go);
+      color: #ffffff;
+    }
+
+    .step-name {
+      font-family: var(--font-display);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .step-item.active .step-name { color: var(--accent); font-weight: 700; }
+    .step-item.paused .step-name { color: var(--hold); font-weight: 700; }
+    .step-item.done .step-name { color: var(--ink); }
+
+    .step-state {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      padding-left: 30px;
+    }
+
+    .step-item.active .step-state { color: var(--accent); }
+    .step-item.paused .step-state { color: var(--hold); }
+    .step-item.done .step-state { color: var(--go); }
+
+    .tech-timeline .step-state {
+      padding-left: 0;
+    }
+
+    /* Conditional HITL Gate */
+    .hitl-box {
+      border: 1px solid var(--hold-rule);
+      background: var(--hold-tint);
+      border-radius: 8px;
+      padding: 18px 20px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .hitl-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--hold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hitl-desc {
+      font-size: 13px;
+      color: var(--ink-2);
+      max-width: 72ch;
+      text-wrap: pretty;
+    }
+
+    .hitl-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hitl-item {
+      background: var(--paper);
+      border: 1px solid var(--hold-rule);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--ink);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 250px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    @media (max-width: 760px) {
+      .hitl-item { grid-template-columns: 1fr; }
+    }
+
+    /* Requirements Check Schedule + Pre-Qualification Overview */
+    .schedule-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .schedule-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .schedule-list {
+      border-top: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .schedule-empty {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pre-overview {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 18px 0 8px;
+    }
+
+    .snapshot-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background: var(--rule);
+      overflow: hidden;
+    }
+
+    .snapshot-cell {
+      padding: 11px 14px;
+      background: var(--rail);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .snapshot-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .snapshot-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      overflow-wrap: anywhere;
+    }
+
+    .checks-strip-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .empty-guide-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-2);
+      text-wrap: balance;
+    }
+
+    .checks-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background: var(--rule);
+      overflow: hidden;
+    }
+
+    @media (max-width: 780px) {
+      .checks-grid { grid-template-columns: 1fr; }
+    }
+
+    .check-pillar {
+      background: var(--paper);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .check-pillar-head {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .check-pillar-icon {
+      color: var(--accent);
+      display: inline-flex;
+    }
+
+    .check-pillar p {
+      margin: 0;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      text-wrap: pretty;
+    }
+
+    .req-row {
+      padding: 15px 8px;
+      border-bottom: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: start;
+      transition: background-color 0.12s ease;
+    }
+
+    .req-row:hover {
+      background: #f9fbfd;
+    }
+
+    @media (max-width: 680px) {
+      .req-row { grid-template-columns: 1fr; gap: 10px; }
+    }
+
+    .req-body {
+      max-width: 72ch;
+      min-width: 0;
+    }
+
+    .req-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .mandatory-tag {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--wash);
+      border: 1px solid var(--rule);
+      color: var(--ink-2);
+      vertical-align: middle;
+    }
+
+    .req-summary {
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--ink-2);
+    }
+
+    .req-meta {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .req-citations {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--ink-2);
+    }
+
+    .citation-chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--rail);
+      border: 1px solid var(--rule);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-2);
+    }
+
+    .citation-extra {
+      font-size: 11.5px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .req-group-head {
+      padding: 9px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-2);
+      background: var(--rail);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .req-group-head.group-attention {
+      color: var(--nogo);
+      background: var(--nogo-tint);
+    }
+
+    .req-group-head.group-waived {
+      color: var(--accent);
+      background: var(--accent-tint);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--rule);
+      background: var(--rail);
+      color: var(--ink-2);
+      white-space: nowrap;
+    }
+
+    .badge-PASSED {
+      background: var(--go-tint);
+      border-color: var(--go-rule);
+      color: var(--go);
+    }
+
+    .badge-FAILED {
+      background: var(--nogo-tint);
+      border-color: var(--nogo-rule);
+      color: var(--nogo);
+    }
+
+    .badge-UNVERIFIABLE_NEEDS_HUMAN {
+      background: var(--hold-tint);
+      border-color: var(--hold-rule);
+      color: var(--hold);
+    }
+
+    .badge-WAIVED_BY_HUMAN {
+      background: var(--accent-tint);
+      border-color: var(--accent-rule);
+      color: var(--accent);
+    }
+
+    /* Quiet Telemetry Strip (inside System & Audit drawer) */
+    .telemetry-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background: var(--rule);
+      overflow: hidden;
+    }
+
+    .metric-cell {
+      padding: 10px 12px;
+      background: var(--rail);
+    }
+
+    .metric-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .metric-val {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Native Right-Docked System & Audit Drawer with Top-Layer Entry/Exit Animation */
+    dialog.audit-drawer {
+      margin: 0 0 0 auto;
+      width: min(490px, 100vw);
+      max-width: 100vw;
+      height: 100dvh;
+      max-height: 100dvh;
+      border: none;
+      border-left: 1px solid var(--rule);
+      padding: 0;
+      background: var(--paper);
+      color: var(--ink);
+      opacity: 0;
+      transition-property: opacity, transform, display, overlay;
+      transition-duration: 0.24s;
+      transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition-behavior: allow-discrete;
+    }
+
+    dialog.audit-drawer[open]:where(:not([data-closing])) {
+      display: flex;
+      flex-direction: column;
+      opacity: 1;
+
+      @starting-style {
+        opacity: 0;
+      }
+    }
+
+    dialog.audit-drawer[open] {
+      display: flex;
+      flex-direction: column;
+    }
+
+    dialog:modal {
+      overscroll-behavior: contain;
+    }
+
+    dialog.audit-drawer::backdrop {
+      background-color: rgba(15, 34, 54, 0);
+      overflow: hidden;
+      overscroll-behavior: contain;
+      transition-property: background-color, display, overlay;
+      transition-duration: 0.24s;
+      transition-timing-function: ease-out;
+      transition-behavior: allow-discrete;
+    }
+
+    dialog.audit-drawer[open]:where(:not([data-closing]))::backdrop {
+      background-color: rgba(15, 34, 54, 0.36);
+
+      @starting-style {
+        background-color: rgba(15, 34, 54, 0);
+      }
+    }
+
+    .drawer-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--rule);
+      background: var(--rail);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .drawer-body {
+      padding: 18px 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+      scrollbar-width: thin;
+    }
+
+    .drawer-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .drawer-subhead {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--ink-2);
+    }
+
+    .tech-timeline {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      background: var(--rule);
+      overflow: hidden;
+    }
+
+    .trace-count {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .audit-list {
+      max-height: 360px;
+      overflow-y: auto;
+      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+      scrollbar-width: thin;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      background: var(--rail);
+      color: var(--ink-2);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .audit-entry {
+      padding: 6px 0;
+      border-bottom: 1px solid var(--rule);
+      word-break: break-word;
+    }
+
+    .audit-entry:last-child { border-bottom: none; }
+
+    .audit-node {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Compositor-only motion strictly opt-in */
+    @media (prefers-reduced-motion: no-preference) {
+      dialog.audit-drawer {
+        transform: translateX(28px);
+      }
+
+      dialog.audit-drawer[open]:where(:not([data-closing])) {
+        transform: translateX(0);
+
+        @starting-style {
+          transform: translateX(28px);
+        }
+      }
+
+      .hitl-box.is-open {
+        animation: panel-reveal 0.22s ease-out;
+      }
+
+      .verdict-banner.is-updated {
+        animation: panel-reveal 0.22s ease-out;
+      }
+
+      @keyframes panel-reveal {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      dialog.audit-drawer,
+      dialog.audit-drawer::backdrop {
+        transition-duration: 0.1s;
+      }
+    }
+
+    @supports not (scrollbar-color: auto) {
+      .qualification-desk,
+      .solicitation-rail,
+      .rfp-preview,
+      .drawer-body,
+      .audit-list {
+        scrollbar-width: auto;
+      }
+      .qualification-desk::-webkit-scrollbar,
+      .solicitation-rail::-webkit-scrollbar,
+      .rfp-preview::-webkit-scrollbar,
+      .drawer-body::-webkit-scrollbar,
+      .audit-list::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      .qualification-desk::-webkit-scrollbar-thumb,
+      .solicitation-rail::-webkit-scrollbar-thumb,
+      .rfp-preview::-webkit-scrollbar-thumb,
+      .drawer-body::-webkit-scrollbar-thumb,
+      .audit-list::-webkit-scrollbar-thumb {
+        background: var(--scrollbar-thumb);
+        border-radius: 999px;
+      }
+      .qualification-desk::-webkit-scrollbar-track,
+      .solicitation-rail::-webkit-scrollbar-track,
+      .rfp-preview::-webkit-scrollbar-track,
+      .drawer-body::-webkit-scrollbar-track,
+      .audit-list::-webkit-scrollbar-track {
+        background: var(--scrollbar-track);
+      }
+    }
+
+    @media (forced-colors: active) {
+      :root {
+        --rule: CanvasText;
+        --control-border: ButtonBorder;
+      }
+      .verdict-banner,
+      .hitl-box,
+      .hitl-item,
+      .timeline,
+      .tech-timeline,
+      .step-item,
+      .telemetry-strip,
+      .metric-cell,
+      .snapshot-bar,
+      .snapshot-cell,
+      .checks-grid,
+      .check-pillar,
+      .audit-drawer,
+      .audit-list,
+      .rfp-preview,
+      .mode-toggle,
+      .mode-btn,
+      .status-badge,
+      .mandatory-tag,
+      .count-pill,
+      .citation-chip,
+      .btn-badge,
+      .assumptions-bar,
+      .verdict-conf {
+        border: 1px solid CanvasText;
+        background: Canvas;
+        color: CanvasText;
+      }
+      .step-item.active,
+      .step-item.paused {
+        outline: 2px solid Highlight;
+      }
+      .req-row,
+      .req-group-head {
+        border-bottom: 1px solid CanvasText;
+      }
+      .verdict-guardrails {
+        border-top-color: CanvasText;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-group">
+      <div class="brand-mark" aria-hidden="true">PG</div>
+      <div class="brand-title">PursuitGuard</div>
+      <span class="brand-scope">Bid / No-Bid qualification</span>
+    </div>
+    <div class="topbar-actions">
+      <button id="audit-btn" type="button" class="secondary btn-inline">
+        <svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
+          <line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line>
+          <line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line>
+        </svg>
+        <span>Audit &amp; stats</span>
+        <span id="audit-badge" class="btn-badge">0</span>
+      </button>
+      <button id="reset-btn" type="button" class="secondary btn-inline">
+        <svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>New pursuit</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="desk">
+    <!-- Left Rail: Solicitation Input & Scenario Testing -->
+    <aside class="solicitation-rail" aria-label="Solicitation and scenario controls">
+      <h2 class="section-heading">Solicitation input</h2>
+
+      <div class="field-group">
+        <label for="rfp-select">SAM.gov solicitation</label>
+        <select id="rfp-select"></select>
+      </div>
+
+      <div class="field-group">
+        <label for="workspace-select">Workspace scope</label>
+        <select id="workspace-select">
+          <option value="commercial_aec" selected>Commercial AEC (Standard)</option>
+          <option value="restricted_defense">Restricted Defense (Authorized)</option>
+        </select>
+      </div>
+
+      <button id="run-btn" type="button" class="primary-full btn-inline">
+        <svg class="ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="6 3 20 12 6 21 6 3"></polygon>
+        </svg>
+        <span>Qualify pursuit</span>
+      </button>
+
+      <div class="field-group">
+        <div class="field-header">
+          <label for="rfp-text">RFP source</label>
+          <div class="mode-toggle" role="group" aria-label="RFP display mode">
+            <button id="rfp-preview-btn" type="button" class="mode-btn is-active" aria-pressed="true">Preview</button>
+            <button id="rfp-edit-btn" type="button" class="mode-btn" aria-pressed="false">Edit</button>
+          </div>
+        </div>
+        <div id="rfp-preview" class="rfp-preview" tabindex="0" aria-label="Rendered RFP preview"></div>
+        <textarea id="rfp-text" spellcheck="false" hidden></textarea>
+        <span class="field-hint">Double-click preview to edit</span>
+      </div>
+
+      <div class="rail-divider">
+        <label for="whatif-input">Test a What-If scenario</label>
+        <span class="field-hint">Check how the verdict changes if a rule or partner assumption changes.</span>
+        <div class="whatif-stack">
+          <input id="whatif-input" type="text" placeholder="e.g. Assume JV partner covers CA SE license" disabled />
+          <div id="whatif-chips" class="row" style="flex-wrap: wrap;"></div>
+          <button id="whatif-btn" type="button" class="secondary primary-full" disabled>Run scenario</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Main Qualification Desk -->
+    <main class="qualification-desk">
+      <!-- Centerpiece Bid Recommendation -->
+      <section id="verdict-banner" class="verdict-banner" aria-live="polite">
+        <div class="verdict-head">
+          <div>
+            <div class="verdict-kicker">Bid recommendation</div>
+            <div id="verdict-tag" class="verdict-tag">Ready to qualify</div>
+          </div>
+          <div class="verdict-actions">
+            <div id="verdict-conf" class="verdict-conf">Ready</div>
+            <span class="copy-wrap">
+              <button id="copy-brief-btn" type="button" class="secondary copy-btn btn-inline" command="--copy" commandfor="brief-copy-source" hidden>
+                <svg class="ui-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>Copy summary</span>
+              </button>
+              <span class="copy-tip" role="status"></span>
+            </span>
+          </div>
+        </div>
+        <textarea id="brief-copy-source" class="sr-only" readonly tabindex="-1" aria-hidden="true"></textarea>
+        <div id="verdict-counts" class="verdict-counts" hidden></div>
+        <div id="assumptions-bar" class="assumptions-bar" hidden></div>
+        <div id="verdict-summary" class="verdict-summary">Select a solicitation on the left and click Qualify pursuit to verify mandatory requirements against firm CRM and closeout records.</div>
+      </section>
+
+      <!-- Horizontal 4-Step End-User Progress Rail -->
+      <section class="pipeline-section" aria-label="Qualification workflow progress">
+        <div id="timeline" class="timeline"></div>
+        <div id="live-status" class="live-status" aria-live="polite" hidden></div>
+      </section>
+
+      <!-- Human Review Interrupt Gate -->
+      <section id="hitl-box" class="hitl-box" role="region" aria-label="Human review gate">
+        <div class="hitl-title">
+          <svg class="ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>Human review required</span>
+        </div>
+        <div class="hitl-desc">Resolve CRM vs. closeout discrepancies or confirm unverifiable mandatory requirements before locking the bid recommendation.</div>
+        <div id="hitl-items" class="hitl-items"></div>
+        <div>
+          <button id="resume-btn" type="button">Apply choices and continue</button>
+        </div>
+      </section>
+
+      <!-- Priority-Sorted Requirements Check / Pre-Qualification Overview -->
+      <section class="schedule-section" aria-label="Requirements check">
+        <div class="schedule-header">
+          <h2 class="section-heading">Requirements check</h2>
+          <span id="schedule-note" class="field-hint">Criteria appear here once the RFP is read</span>
+        </div>
+        <div id="req-list" class="schedule-list">
+          <div class="schedule-empty">Loading solicitation overview...</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Native Right-Docked System & Audit Drawer -->
+  <dialog id="audit-dialog" class="audit-drawer" closedby="any" aria-labelledby="audit-dialog-title">
+    <div class="drawer-head">
+      <div>
+        <h2 id="audit-dialog-title" class="section-heading">System &amp; audit trail</h2>
+        <div class="field-hint">Agent efficiency, safety caps, and step-by-step execution events</div>
+      </div>
+      <form id="audit-close-form" method="dialog">
+        <button type="submit" class="secondary">Close</button>
+      </form>
+    </div>
+    <div class="drawer-body">
+      <section class="telemetry-strip drawer-metrics" aria-label="Execution budget and context pruning">
+        <div class="metric-cell">
+          <div class="metric-label">Tool / LLM calls</div>
+          <div id="m-calls" class="metric-val">0 / 0</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Tokens (in / out)</div>
+          <div id="m-tokens" class="metric-val">0 / 0</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Tokens pruned</div>
+          <div id="m-pruned" class="metric-val">0</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-label">Raw RFP cleared</div>
+          <div id="m-cleared" class="metric-val">—</div>
+        </div>
+      </section>
+      <section class="drawer-section" aria-label="Technical workflow nodes">
+        <div class="drawer-subhead">Pipeline nodes</div>
+        <div id="tech-timeline" class="tech-timeline"></div>
+      </section>
+      <section class="drawer-section" aria-label="Execution audit log">
+        <div class="drawer-subhead">
+          <span>Execution audit log</span>
+          <span id="audit-count" class="trace-count">0 events</span>
+        </div>
+        <div id="audit-list" class="audit-list">Waiting for run.</div>
+      </section>
+    </div>
+  </dialog>
+
+  <script>
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    const USER_STEPS = [
+      { key: "read", num: "1", label: "Read RFP", nodes: ["entry_router", "extract_requirements", "apply_what_if_delta"] },
+      { key: "verify", num: "2", label: "Check firm records", nodes: ["verify_requirements", "reconcile_freshness", "prune_context"] },
+      { key: "review", num: "3", label: "Human review", nodes: ["hitl_review_gate"] },
+      { key: "decide", num: "4", label: "Bid decision", nodes: ["emit_scorecard"] }
+    ];
+
+    const TECH_STEPS = [
+      ["entry_router", "1 Route", "Entry Router (New RFP vs. What-If)"],
+      ["extract_requirements", "2 Extract", "Extract Checklist and Clear Raw RFP"],
+      ["apply_what_if_delta", "3 What-If", "Patch What-If Delta Criteria"],
+      ["verify_requirements", "4 Verify CRM", "Sequential MCP Verification Loop"],
+      ["reconcile_freshness", "5 Freshness", "Blocked Fuzzy Freshness Check"],
+      ["prune_context", "6 Prune", "Window and Summary Context Pruning"],
+      ["hitl_review_gate", "7 Review gate", "Zero-LLM Human Review Interrupt Gate"],
+      ["emit_scorecard", "8 Scorecard", "Mandatory Guardrail and Scorecard"]
+    ];
+
+    const VERDICT_META = {
+      GO: { icon: "check", label: "Go" },
+      CONDITIONAL_GO: { icon: "alert", label: "Conditional Go" },
+      NO_GO: { icon: "x", label: "No-Go" },
+      HITL_REQUIRED: { icon: "pause", label: "Review required" }
+    };
+
+    const STATUS_META = {
+      PASSED: { icon: "check", label: "Met", cls: "PASSED" },
+      FAILED: { icon: "x", label: "Not met", cls: "FAILED" },
+      UNVERIFIABLE_NEEDS_HUMAN: { icon: "alert", label: "Needs review", cls: "UNVERIFIABLE_NEEDS_HUMAN" },
+      WAIVED_BY_HUMAN: { icon: "diamond", label: "Waived", cls: "WAIVED_BY_HUMAN" },
+      PENDING: { icon: "clock", label: "Pending", cls: "PENDING" }
+    };
+
+    const DISCREPANCY_LABELS = {
+      METRIC_CLASH: "CRM vs. closeout mismatch",
+      AMBIGUOUS_ENTITY_MATCH: "Similar project names — confirm match",
+      STALE_CRM_SYNC: "Outdated CRM record"
+    };
+
+    const GUARDRAIL_KIND_LABELS = {
+      METRIC_CLASH: "Data mismatch",
+      AMBIGUOUS_ENTITY_MATCH: "Similar project match",
+      STALE_CRM_SYNC: "Outdated CRM sync"
+    };
+
+    const HITL_CHOICE_LABELS = {
+      use_closeout: "used newer closeout sheet",
+      use_crm: "kept CRM record",
+      acknowledge: "acknowledged sync lag"
+    };
+
+    let threadId = "ui-" + Math.random().toString(36).slice(2, 9);
+    let rfps = [];
+    let lastState = null;
+    const seenNodes = new Set();
+
+    const rfpSelect = document.getElementById("rfp-select");
+    const rfpText = document.getElementById("rfp-text");
+    const rfpPreview = document.getElementById("rfp-preview");
+    const rfpPreviewBtn = document.getElementById("rfp-preview-btn");
+    const rfpEditBtn = document.getElementById("rfp-edit-btn");
+    const wsSelect = document.getElementById("workspace-select");
+    const runBtn = document.getElementById("run-btn");
+    const resetBtn = document.getElementById("reset-btn");
+    const auditBtn = document.getElementById("audit-btn");
+    const auditBadge = document.getElementById("audit-badge");
+    const auditDialog = document.getElementById("audit-dialog");
+    const auditCloseForm = document.getElementById("audit-close-form");
+    const whatifInput = document.getElementById("whatif-input");
+    const whatifBtn = document.getElementById("whatif-btn");
+    const whatifChips = document.getElementById("whatif-chips");
+    const hitlBox = document.getElementById("hitl-box");
+    const hitlItems = document.getElementById("hitl-items");
+    const resumeBtn = document.getElementById("resume-btn");
+    const verdictBanner = document.getElementById("verdict-banner");
+    const verdictCounts = document.getElementById("verdict-counts");
+    const assumptionsBar = document.getElementById("assumptions-bar");
+    const copyBriefBtn = document.getElementById("copy-brief-btn");
+    const briefCopySource = document.getElementById("brief-copy-source");
+    const liveStatus = document.getElementById("live-status");
+    const scheduleNote = document.getElementById("schedule-note");
+    const auditCount = document.getElementById("audit-count");
+
+    function makeSvgIcon(name, size = 16) {
+      const svg = document.createElementNS(SVG_NS, "svg");
+      svg.setAttribute("class", "ui-icon");
+      svg.setAttribute("width", String(size));
+      svg.setAttribute("height", String(size));
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("fill", "none");
+      svg.setAttribute("stroke", "currentColor");
+      svg.setAttribute("stroke-width", "2.2");
+      svg.setAttribute("stroke-linecap", "round");
+      svg.setAttribute("stroke-linejoin", "round");
+      svg.setAttribute("aria-hidden", "true");
+
+      const addEl = (tag, attrs) => {
+        const el = document.createElementNS(SVG_NS, tag);
+        Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, String(v)));
+        svg.appendChild(el);
+      };
+
+      if (name === "check") {
+        addEl("polyline", { points: "20 6 9 17 4 12" });
+      } else if (name === "x") {
+        addEl("line", { x1: "18", y1: "6", x2: "6", y2: "18" });
+        addEl("line", { x1: "6", y1: "6", x2: "18", y2: "18" });
+      } else if (name === "alert") {
+        addEl("path", { d: "M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" });
+        addEl("line", { x1: "12", y1: "9", x2: "12", y2: "13" });
+        addEl("line", { x1: "12", y1: "17", x2: "12.01", y2: "17" });
+      } else if (name === "pause") {
+        addEl("rect", { x: "6", y: "4", width: "4", height: "16" });
+        addEl("rect", { x: "14", y: "4", width: "4", height: "16" });
+      } else if (name === "diamond") {
+        addEl("path", { d: "M12 3 21 12 12 21 3 12 12 3z" });
+      } else if (name === "clock") {
+        addEl("circle", { cx: "12", cy: "12", r: "9" });
+        addEl("polyline", { points: "12 7 12 12 15 14" });
+      } else if (name === "building") {
+        addEl("rect", { x: "4", y: "3", width: "16", height: "18", rx: "1" });
+        addEl("line", { x1: "9", y1: "8", x2: "9.01", y2: "8" });
+        addEl("line", { x1: "15", y1: "8", x2: "15.01", y2: "8" });
+        addEl("line", { x1: "9", y1: "12", x2: "9.01", y2: "12" });
+        addEl("line", { x1: "15", y1: "12", x2: "15.01", y2: "12" });
+        addEl("path", { d: "M9 21v-4h6v4" });
+      } else if (name === "shield") {
+        addEl("path", { d: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" });
+        addEl("polyline", { points: "9 12 11 14 15 10" });
+      } else if (name === "refresh") {
+        addEl("polyline", { points: "23 4 23 10 17 10" });
+        addEl("path", { d: "M20.49 15a9 9 0 1 1-2.12-9.36L23 10" });
+      } else {
+        addEl("circle", { cx: "12", cy: "12", r: "4" });
+      }
+
+      return svg;
+    }
+
+    function appendInlineMarkdown(parent, text) {
+      const tokenRe = /(\*\*(?=\S)(?:[^*\n]*?\S)\*\*|`[^`\n]+`|\*(?=\S)(?:[^*\n]*?\S)\*)/g;
+      let lastIndex = 0;
+      let match;
+      while ((match = tokenRe.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+          parent.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+        }
+        const tok = match[0];
+        let node;
+        if (tok.startsWith("**")) {
+          node = document.createElement("strong");
+          node.textContent = tok.slice(2, -2);
+        } else if (tok.startsWith("`")) {
+          node = document.createElement("code");
+          node.textContent = tok.slice(1, -1);
+        } else {
+          node = document.createElement("em");
+          node.textContent = tok.slice(1, -1);
+        }
+        parent.appendChild(node);
+        lastIndex = tokenRe.lastIndex;
+      }
+      if (lastIndex < text.length) {
+        parent.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+    }
+
+    function renderMarkdown(container, rawText, emptyText = "") {
+      const frag = document.createDocumentFragment();
+      const raw = String(rawText || "");
+      if (!raw.trim()) {
+        if (emptyText) {
+          const empty = document.createElement("div");
+          empty.className = "rfp-empty";
+          empty.textContent = emptyText;
+          frag.appendChild(empty);
+        }
+        container.replaceChildren(frag);
+        return;
+      }
+
+      let listEl = null;
+      let paraLines = [];
+
+      const flushPara = () => {
+        if (!paraLines.length) return;
+        const p = document.createElement("p");
+        appendInlineMarkdown(p, paraLines.join(" "));
+        frag.appendChild(p);
+        paraLines = [];
+      };
+
+      const flushList = () => {
+        listEl = null;
+      };
+
+      raw.replace(/\r\n/g, "\n").split("\n").forEach((line) => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          flushPara();
+          flushList();
+          return;
+        }
+        if (/^(?:-{3,}|\*{3,})$/.test(trimmed)) {
+          flushPara();
+          flushList();
+          frag.appendChild(document.createElement("hr"));
+          return;
+        }
+        const headingMatch = /^(#{1,3})\s+(.+)$/.exec(trimmed);
+        if (headingMatch) {
+          flushPara();
+          flushList();
+          const heading = document.createElement("h" + headingMatch[1].length);
+          appendInlineMarkdown(heading, headingMatch[2]);
+          frag.appendChild(heading);
+          return;
+        }
+        const ulMatch = /^[-*]\s+(.+)$/.exec(trimmed);
+        if (ulMatch) {
+          flushPara();
+          if (!listEl || listEl.tagName !== "UL") {
+            listEl = document.createElement("ul");
+            frag.appendChild(listEl);
+          }
+          const li = document.createElement("li");
+          appendInlineMarkdown(li, ulMatch[1]);
+          listEl.appendChild(li);
+          return;
+        }
+        const olMatch = /^(\d+)\.\s+(.+)$/.exec(trimmed);
+        if (olMatch) {
+          flushPara();
+          const num = Number(olMatch[1]);
+          if (!listEl || listEl.tagName !== "OL") {
+            listEl = document.createElement("ol");
+            if (num !== 1) listEl.start = num;
+            frag.appendChild(listEl);
+          }
+          const li = document.createElement("li");
+          appendInlineMarkdown(li, olMatch[2]);
+          listEl.appendChild(li);
+          return;
+        }
+        flushList();
+        paraLines.push(trimmed);
+      });
+
+      flushPara();
+      flushList();
+      container.replaceChildren(frag);
+    }
+
+    function parseRfpOverview(markdownText) {
+      const text = String(markdownText || "");
+      const field = (label) => {
+        const re = new RegExp(`^[-*]\\s*\\*\\*${label}:\\*\\*\\s*(.+)$`, "im");
+        const m = re.exec(text);
+        return m ? m[1].trim() : "";
+      };
+      const reqMatches = text.match(/^\s*\d+\.\s+/gm);
+      return {
+        agency: field("Agency \\/ Client"),
+        location: field("Location"),
+        contractType: field("Contract Type"),
+        criteriaCount: reqMatches ? reqMatches.length : 0
+      };
+    }
+
+    function renderPreRunOverview() {
+      if (lastState) return;
+      const info = parseRfpOverview(rfpText.value);
+      scheduleNote.textContent = info.criteriaCount
+        ? `${info.criteriaCount} criteria detected in solicitation`
+        : "Criteria appear here once the RFP is read";
+
+      const reqList = document.getElementById("req-list");
+      const wrap = document.createElement("div");
+      wrap.className = "pre-overview";
+
+      const snapItems = [];
+      if (info.agency) snapItems.push(["Client / Agency", info.agency]);
+      if (info.location) snapItems.push(["Location", info.location]);
+      if (info.contractType) snapItems.push(["Contract & Value", info.contractType]);
+      if (info.criteriaCount) snapItems.push(["Listed Criteria", `${info.criteriaCount} items`]);
+
+      if (snapItems.length) {
+        const snapBar = document.createElement("div");
+        snapBar.className = "snapshot-bar";
+        snapItems.forEach(([label, value]) => {
+          const cell = document.createElement("div");
+          cell.className = "snapshot-cell";
+          const lbl = document.createElement("div");
+          lbl.className = "snapshot-label";
+          lbl.textContent = label;
+          const val = document.createElement("div");
+          val.className = "snapshot-value";
+          val.textContent = value;
+          cell.append(lbl, val);
+          snapBar.appendChild(cell);
+        });
+        wrap.appendChild(snapBar);
+      }
+
+      const pillarsWrap = document.createElement("div");
+      pillarsWrap.className = "checks-strip-wrap";
+      const guideTitle = document.createElement("h3");
+      guideTitle.className = "empty-guide-title";
+      guideTitle.textContent = "What PursuitGuard checks when you run qualification";
+      pillarsWrap.appendChild(guideTitle);
+
+      const grid = document.createElement("div");
+      grid.className = "checks-grid";
+      const pillars = [
+        {
+          icon: "building",
+          title: "Past projects",
+          desc: "Matches completed project counts, min sq ft, fees, and years in firm CRM."
+        },
+        {
+          icon: "shield",
+          title: "Staff licenses",
+          desc: "Checks active vs. expired state licenses (PE, SE, etc.) on key personnel."
+        },
+        {
+          icon: "refresh",
+          title: "Data freshness",
+          desc: "Flags stale CRM records, closeout clashes, and unmapped rules for human review."
+        }
+      ];
+
+      pillars.forEach((p) => {
+        const card = document.createElement("div");
+        card.className = "check-pillar";
+        const head = document.createElement("div");
+        head.className = "check-pillar-head";
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "check-pillar-icon";
+        iconSpan.appendChild(makeSvgIcon(p.icon, 15));
+        const titleSpan = document.createElement("span");
+        titleSpan.textContent = p.title;
+        head.append(iconSpan, titleSpan);
+
+        const body = document.createElement("p");
+        body.textContent = p.desc;
+        card.append(head, body);
+        grid.appendChild(card);
+      });
+
+      pillarsWrap.appendChild(grid);
+      wrap.appendChild(pillarsWrap);
+      reqList.replaceChildren(wrap);
+    }
+
+    function renderRfpPreview() {
+      renderMarkdown(
+        rfpPreview,
+        rfpText.value,
+        "No solicitation text yet. Switch to Edit to paste or modify Markdown."
+      );
+    }
+
+    function setRfpMode(mode) {
+      const isEdit = mode === "edit";
+      rfpPreview.hidden = isEdit;
+      rfpText.hidden = !isEdit;
+      rfpPreviewBtn.classList.toggle("is-active", !isEdit);
+      rfpEditBtn.classList.toggle("is-active", isEdit);
+      rfpPreviewBtn.setAttribute("aria-pressed", String(!isEdit));
+      rfpEditBtn.setAttribute("aria-pressed", String(isEdit));
+      if (isEdit) {
+        rfpText.focus();
+      } else {
+        renderRfpPreview();
+        renderPreRunOverview();
+      }
+    }
+
+    function humanizeGuardrailNote(note, state) {
+      const raw = String(note || "").trim();
+      if (!raw) return raw;
+
+      const discMatch = /^(\S+)\s+\((METRIC_CLASH|AMBIGUOUS_ENTITY_MATCH|STALE_CRM_SYNC)\):\s+human selected '([^']+)'\.?$/.exec(raw);
+      if (discMatch) {
+        const [, discId, kind, choice] = discMatch;
+        const disc = (state?.discrepancies || []).find((d) => d.discrepancy_id === discId);
+        const subject = disc ? (disc.crm_title || disc.closeout_title || discId) : discId;
+        const kindLabel = GUARDRAIL_KIND_LABELS[kind] || kind;
+        const choiceLabel = HITL_CHOICE_LABELS[choice] || choice;
+        return `${kindLabel} (${subject}): ${choiceLabel}.`;
+      }
+
+      const waiveMatch = /^Requirement (\S+) verified\/waived by human \(([^)]+)\)\.?$/.exec(raw);
+      if (waiveMatch) {
+        const req = (state?.pinned_requirements || []).find((r) => r.req_id === waiveMatch[1]);
+        const title = req ? req.title : waiveMatch[1];
+        return `${title} — waived / verified offline.`;
+      }
+
+      const failMatch = /^Requirement (\S+) marked FAILED by human\.?$/.exec(raw);
+      if (failMatch) {
+        const req = (state?.pinned_requirements || []).find((r) => r.req_id === failMatch[1]);
+        const title = req ? req.title : failMatch[1];
+        return `${title} — rejected by reviewer.`;
+      }
+
+      if (raw === "Mandatory disqualifier FAILED — deterministic guard prohibits GO.") {
+        return "Blocked from Go: one or more mandatory requirements were not met.";
+      }
+      if (raw === "Conditional verdict: relies on explicit human waiver or What-If assumption.") {
+        return "Conditional Go: depends on a reviewer waiver or What-If assumption.";
+      }
+      return raw;
+    }
+
+    function effectiveRequirementStatus(req, ev) {
+      if (req.waived_by_what_if) return "WAIVED_BY_HUMAN";
+      return ev ? ev.status : "PENDING";
+    }
+
+    function requirementUrgencyRank(req, ev) {
+      const status = effectiveRequirementStatus(req, ev);
+      const mandatory = req.is_mandatory !== false;
+      if (status === "FAILED" && mandatory) return 0;
+      if (status === "UNVERIFIABLE_NEEDS_HUMAN" && mandatory) return 1;
+      if (status === "FAILED") return 2;
+      if (status === "UNVERIFIABLE_NEEDS_HUMAN") return 3;
+      if (status === "WAIVED_BY_HUMAN") return 4;
+      if (status === "PASSED") return 5;
+      return 6;
+    }
+
+    function sortRequirementsForDisplay(pinned, evMap) {
+      return (pinned || [])
+        .map((req, idx) => ({
+          req,
+          idx,
+          rank: requirementUrgencyRank(req, (evMap || {})[req.req_id])
+        }))
+        .sort((a, b) => (a.rank - b.rank) || (a.idx - b.idx))
+        .map((entry) => entry.req);
+    }
+
+    function shortChipTitle(title) {
+      const cleaned = String(title || "requirement").replace(/\s*\([^)]*\)\s*/g, " ").trim();
+      return cleaned.length > 26 ? cleaned.slice(0, 24).trimEnd() + "…" : cleaned;
+    }
+
+    function renderWhatIfChips(state) {
+      const frag = document.createDocumentFragment();
+      const sc = state?.scorecard;
+      const chips = [];
+
+      if (sc && state?.pinned_requirements?.length) {
+        const evMap = state.evidence_by_id || {};
+        const sorted = sortRequirementsForDisplay(state.pinned_requirements, evMap);
+        const gaps = sorted.filter((req) => {
+          const st = effectiveRequirementStatus(req, evMap[req.req_id]);
+          return st === "FAILED" || st === "UNVERIFIABLE_NEEDS_HUMAN";
+        });
+
+        gaps.slice(0, 2).forEach((req) => {
+          const shortTitle = shortChipTitle(req.title);
+          if (req.kind === "staff_credential") {
+            chips.push({
+              label: `JV covers ${shortTitle}`,
+              prompt: `Assume a JV partner provides ${req.title}`
+            });
+          } else if (req.kind === "unmapped") {
+            chips.push({
+              label: `Verify ${shortTitle} offline`,
+              prompt: `Assume ${req.title} is verified offline`
+            });
+          } else {
+            chips.push({
+              label: `Partner covers ${shortTitle}`,
+              prompt: `Assume a teaming partner covers ${req.title}`
+            });
+          }
+        });
+
+        const sqftReq = state.pinned_requirements.find(
+          (req) => req.kind === "crm_projects" && req.min_sqft != null
+        );
+        if (sqftReq) {
+          const nextSqft = Number(sqftReq.min_sqft || 50000) + 25000;
+          chips.push({
+            label: `Test ${Math.round(nextSqft / 1000)}k sq ft threshold`,
+            prompt: `Raise minimum project size threshold to ${nextSqft.toLocaleString("en-US")} sq ft`
+          });
+        }
+      }
+
+      if (!chips.length) {
+        chips.push(
+          { label: "75k sq ft threshold", prompt: "Raise minimum project size threshold to 75,000 sq ft", disabled: !sc },
+          { label: "JV covers CA SE license", prompt: "Assume a JV partner provides an active CA SE license", disabled: !sc }
+        );
+      }
+
+      chips.slice(0, 3).forEach((chip) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "secondary chip quick-whatif";
+        btn.textContent = chip.label;
+        btn.disabled = Boolean(chip.disabled);
+        btn.addEventListener("click", () => {
+          whatifInput.value = chip.prompt;
+          whatifInput.focus();
+        });
+        frag.appendChild(btn);
+      });
+
+      whatifChips.replaceChildren(frag);
+    }
+
+    function renderTechnicalTimeline(activeNode = null) {
+      const container = document.getElementById("tech-timeline");
+      const frag = document.createDocumentFragment();
+      TECH_STEPS.forEach(([key, shortLabel, fullTitle]) => {
+        const div = document.createElement("div");
+        const isDone = seenNodes.has(key);
+        const isActive = activeNode === key;
+        div.className = "step-item" + (isActive ? " active" : isDone ? " done" : "");
+        div.title = fullTitle;
+        const stateText = isActive ? "Running..." : isDone ? "Done" : "Idle";
+        div.setAttribute("aria-label", `${fullTitle}: ${stateText}`);
+
+        const nameEl = document.createElement("span");
+        nameEl.className = "step-name";
+        nameEl.textContent = shortLabel;
+
+        const stateEl = document.createElement("span");
+        stateEl.className = "step-state";
+        stateEl.textContent = stateText;
+
+        div.append(nameEl, stateEl);
+        frag.appendChild(div);
+      });
+      container.replaceChildren(frag);
+    }
+
+    function renderTimeline(activeNode = null, phaseState = "idle") {
+      const container = document.getElementById("timeline");
+      const frag = document.createDocumentFragment();
+      USER_STEPS.forEach((step) => {
+        const isActive = activeNode ? step.nodes.includes(activeNode) : false;
+        const isDone = step.nodes.some((n) => seenNodes.has(n));
+        let cls = "step-item";
+        let stateText = "Idle";
+        let dotMode = "num";
+
+        if (isActive) {
+          cls += " active";
+          stateText = "Running...";
+        } else if (step.key === "review" && phaseState === "paused") {
+          cls += " paused";
+          stateText = "Paused";
+          dotMode = "pause";
+        } else if (isDone) {
+          cls += " done";
+          stateText = "Done";
+          dotMode = "check";
+        } else if (step.key === "review" && phaseState === "complete") {
+          stateText = "Not needed";
+        }
+
+        const div = document.createElement("div");
+        div.className = cls;
+        div.setAttribute("aria-label", `${step.num}. ${step.label}: ${stateText}`);
+
+        const top = document.createElement("div");
+        top.className = "step-top";
+
+        const dot = document.createElement("span");
+        dot.className = "step-dot";
+        dot.setAttribute("aria-hidden", "true");
+        if (dotMode === "check") {
+          dot.appendChild(makeSvgIcon("check", 12));
+        } else if (dotMode === "pause") {
+          dot.appendChild(makeSvgIcon("pause", 11));
+        } else {
+          dot.textContent = step.num;
+        }
+
+        const nameEl = document.createElement("span");
+        nameEl.className = "step-name";
+        nameEl.textContent = step.label;
+        top.append(dot, nameEl);
+
+        const stateEl = document.createElement("span");
+        stateEl.className = "step-state";
+        stateEl.textContent = stateText;
+
+        div.append(top, stateEl);
+        frag.appendChild(div);
+      });
+      container.replaceChildren(frag);
+      renderTechnicalTimeline(activeNode);
+    }
+
+    function renderCountPills(pinned, evMap) {
+      if (!pinned.length) {
+        verdictCounts.hidden = true;
+        verdictCounts.replaceChildren();
+        return;
+      }
+
+      let met = 0;
+      let notMet = 0;
+      let review = 0;
+      let waived = 0;
+      pinned.forEach((req) => {
+        const st = effectiveRequirementStatus(req, evMap[req.req_id]);
+        if (st === "PASSED") met += 1;
+        else if (st === "FAILED") notMet += 1;
+        else if (st === "UNVERIFIABLE_NEEDS_HUMAN") review += 1;
+        else if (st === "WAIVED_BY_HUMAN") waived += 1;
+      });
+
+      const items = [
+        { icon: "check", text: `${met} Met`, cls: met > 0 ? "count-met" : "" },
+        { icon: "x", text: `${notMet} Not met`, cls: notMet > 0 ? "count-blocker" : "" },
+        { icon: "alert", text: `${review} Needs review`, cls: review > 0 ? "count-review" : "" },
+        { icon: "diamond", text: `${waived} Waived`, cls: waived > 0 ? "count-waived" : "" }
+      ];
+
+      const frag = document.createDocumentFragment();
+      items.forEach((item) => {
+        const pill = document.createElement("span");
+        pill.className = "count-pill" + (item.cls ? " " + item.cls : "");
+        pill.appendChild(makeSvgIcon(item.icon, 13));
+        pill.appendChild(document.createTextNode(item.text));
+        frag.appendChild(pill);
+      });
+      verdictCounts.replaceChildren(frag);
+      verdictCounts.hidden = false;
+    }
+
+    function buildBidBrief(state) {
+      const sc = state?.scorecard;
+      if (!sc) return "";
+      const meta = VERDICT_META[sc.verdict] || { label: sc.verdict };
+      const rfpTitle = rfpSelect.options[rfpSelect.selectedIndex]?.textContent || "Selected solicitation";
+      const wsLabel = wsSelect.options[wsSelect.selectedIndex]?.textContent || state.workspace_id || "";
+      const lines = [
+        `PursuitGuard Bid Recommendation: ${meta.label} (${String(sc.confidence || "").toLowerCase()} confidence)`,
+        `Solicitation: ${rfpTitle}`,
+        `Workspace: ${wsLabel}`,
+        `Summary counts: Met ${sc.requirements_passed} | Not met ${sc.requirements_failed} | Needs review ${sc.requirements_unverifiable} | Waived ${sc.requirements_waived}`,
+        "",
+        sc.summary || ""
+      ];
+
+      if (state.what_if_assumptions?.length) {
+        lines.push("", `Active What-If assumptions: ${state.what_if_assumptions.join("; ")}`);
+      }
+
+      const evMap = state.evidence_by_id || {};
+      const sorted = sortRequirementsForDisplay(state.pinned_requirements || [], evMap);
+      const attention = sorted.filter((req) => {
+        const st = effectiveRequirementStatus(req, evMap[req.req_id]);
+        return st !== "PASSED" && st !== "WAIVED_BY_HUMAN";
+      });
+      if (attention.length) {
+        lines.push("", "Needs attention:");
+        attention.forEach((req) => {
+          const ev = evMap[req.req_id];
+          lines.push(`- ${req.title}: ${ev ? ev.summary : req.description}`);
+        });
+      }
+
+      if (sc.guardrail_notes?.length) {
+        lines.push("", "Key decision notes:");
+        sc.guardrail_notes.forEach((note) => {
+          lines.push(`- ${humanizeGuardrailNote(note, state)}`);
+        });
+      }
+
+      return lines.join("\n").trim();
+    }
+
+    function setVerdictHeadline(vTag, iconName, labelText, colorClass) {
+      vTag.replaceChildren();
+      if (iconName) {
+        vTag.appendChild(makeSvgIcon(iconName, 26));
+      }
+      const span = document.createElement("span");
+      span.textContent = labelText;
+      vTag.appendChild(span);
+      vTag.className = "verdict-tag" + (colorClass ? " " + colorClass : "");
+    }
+
+    function renderState(state) {
+      if (!state) return;
+      lastState = state;
+      const sc = state.scorecard;
+      const vTag = document.getElementById("verdict-tag");
+      const vConf = document.getElementById("verdict-conf");
+      const vSum = document.getElementById("verdict-summary");
+      const pinned = state.pinned_requirements || [];
+      const evMap = state.evidence_by_id || {};
+
+      verdictBanner.className = "verdict-banner is-updated";
+      renderCountPills(pinned, evMap);
+
+      if (state.what_if_assumptions?.length) {
+        assumptionsBar.textContent = "";
+        const label = document.createElement("strong");
+        label.textContent = "Active What-If assumptions: ";
+        assumptionsBar.appendChild(label);
+        assumptionsBar.appendChild(document.createTextNode(state.what_if_assumptions.join(" • ")));
+        assumptionsBar.hidden = false;
+      } else {
+        assumptionsBar.hidden = true;
+        assumptionsBar.replaceChildren();
+      }
+
+      if (sc) {
+        const meta = VERDICT_META[sc.verdict] || { icon: "clock", label: sc.verdict };
+        verdictBanner.classList.add("banner-" + sc.verdict);
+        setVerdictHeadline(vTag, meta.icon, meta.label, "v-" + sc.verdict);
+        const confWord = String(sc.confidence || "");
+        vConf.textContent = (confWord ? confWord.charAt(0).toUpperCase() + confWord.slice(1).toLowerCase() : "Calculated") + " confidence";
+        renderMarkdown(vSum, sc.summary || "");
+        if (sc.guardrail_notes?.length) {
+          const gWrap = document.createElement("div");
+          gWrap.className = "verdict-guardrails";
+          const gLabel = document.createElement("div");
+          gLabel.className = "verdict-guardrails-label";
+          gLabel.textContent = "Key decision notes";
+          gWrap.appendChild(gLabel);
+          const gList = document.createElement("ul");
+          sc.guardrail_notes.forEach((note) => {
+            const li = document.createElement("li");
+            appendInlineMarkdown(li, humanizeGuardrailNote(note, state));
+            gList.appendChild(li);
+          });
+          gWrap.appendChild(gList);
+          vSum.appendChild(gWrap);
+        }
+        briefCopySource.value = buildBidBrief(state);
+        copyBriefBtn.hidden = false;
+        whatifInput.disabled = false;
+        whatifBtn.disabled = false;
+      } else {
+        verdictBanner.classList.add("banner-HITL_REQUIRED");
+        setVerdictHeadline(vTag, VERDICT_META.HITL_REQUIRED.icon, VERDICT_META.HITL_REQUIRED.label, "v-HITL_REQUIRED");
+        vConf.textContent = "Awaiting sign-off";
+        vSum.textContent = "Qualification paused for human review. Resolve the flagged items below to finalize the bid recommendation.";
+        briefCopySource.value = "";
+        copyBriefBtn.hidden = true;
+        whatifInput.disabled = true;
+        whatifBtn.disabled = true;
+      }
+
+      renderWhatIfChips(state);
+
+      const reqList = document.getElementById("req-list");
+      scheduleNote.textContent = pinned.length
+        ? `${pinned.length} ${pinned.length === 1 ? "criterion" : "criteria"} evaluated`
+        : "Criteria appear here once the RFP is read";
+
+      if (!pinned.length) {
+        const empty = document.createElement("div");
+        empty.className = "schedule-empty";
+        empty.textContent = "No requirements extracted yet.";
+        reqList.replaceChildren(empty);
+      } else {
+        const sorted = sortRequirementsForDisplay(pinned, evMap);
+        const groupCounts = { attention: 0, waived: 0, met: 0 };
+        sorted.forEach((req) => {
+          const rank = requirementUrgencyRank(req, evMap[req.req_id]);
+          const gk = rank <= 3 ? "attention" : rank === 4 ? "waived" : "met";
+          groupCounts[gk] += 1;
+        });
+
+        const frag = document.createDocumentFragment();
+        let lastGroup = null;
+
+        sorted.forEach((req) => {
+          const ev = evMap[req.req_id];
+          const rawStatus = effectiveRequirementStatus(req, ev);
+          const meta = STATUS_META[rawStatus] || { icon: "clock", label: rawStatus, cls: "PENDING" };
+          const rank = requirementUrgencyRank(req, ev);
+          const groupKey = rank <= 3 ? "attention" : rank === 4 ? "waived" : "met";
+
+          if (groupKey !== lastGroup) {
+            const groupHead = document.createElement("div");
+            groupHead.className = "req-group-head" + (groupKey !== "met" ? ` group-${groupKey}` : "");
+            const groupLabel =
+              groupKey === "attention"
+                ? "Needs attention"
+                : groupKey === "waived"
+                  ? "Waived or assumed"
+                  : "Met requirements";
+            groupHead.textContent = `${groupLabel} · ${groupCounts[groupKey]}`;
+            frag.appendChild(groupHead);
+            lastGroup = groupKey;
+          }
+
+          const row = document.createElement("div");
+          row.className = `req-row req-${meta.cls}`;
+
+          const body = document.createElement("div");
+          body.className = "req-body";
+
+          const titleEl = document.createElement("div");
+          titleEl.className = "req-title";
+          titleEl.textContent = req.title;
+          if (req.is_mandatory) {
+            const tag = document.createElement("span");
+            tag.className = "mandatory-tag";
+            tag.textContent = "Mandatory";
+            titleEl.appendChild(tag);
+          }
+          body.appendChild(titleEl);
+
+          const summaryEl = document.createElement("div");
+          summaryEl.className = "req-summary";
+          renderMarkdown(summaryEl, ev ? ev.summary : req.description);
+          body.appendChild(summaryEl);
+
+          const metaParts = [];
+          if (ev?.total_fee_usd > 0) {
+            metaParts.push(`Total fee: $${Number(ev.total_fee_usd).toLocaleString("en-US")}`);
+          }
+          if (ev?.oldest_sync_at) {
+            metaParts.push(`CRM synced ${ev.oldest_sync_at}`);
+          }
+          if (metaParts.length) {
+            const metaEl = document.createElement("div");
+            metaEl.className = "req-meta";
+            metaEl.textContent = metaParts.join(" · ");
+            body.appendChild(metaEl);
+          }
+
+          if (ev?.citations?.length) {
+            const citEl = document.createElement("div");
+            citEl.className = "req-citations";
+            const citLabel = document.createElement("strong");
+            citLabel.textContent = "Evidence:";
+            citEl.appendChild(citLabel);
+            ev.citations.slice(0, 4).forEach((cit) => {
+              const chip = document.createElement("span");
+              chip.className = "citation-chip";
+              chip.textContent = cit;
+              citEl.appendChild(chip);
+            });
+            if (ev.citations.length > 4) {
+              const extra = document.createElement("span");
+              extra.className = "citation-extra";
+              extra.textContent = `+${ev.citations.length - 4} more`;
+              citEl.appendChild(extra);
+            }
+            body.appendChild(citEl);
+          }
+
+          const badgeWrap = document.createElement("div");
+          const badge = document.createElement("span");
+          badge.className = `status-badge badge-${meta.cls}`;
+          badge.appendChild(makeSvgIcon(meta.icon, 14));
+          badge.appendChild(document.createTextNode(meta.label));
+          badgeWrap.appendChild(badge);
+
+          row.append(body, badgeWrap);
+          frag.appendChild(row);
+        });
+        reqList.replaceChildren(frag);
+      }
+
+      const b = state.budget || {};
+      document.getElementById("m-calls").textContent = `${b.tool_calls || 0} / ${b.llm_calls || 0}`;
+      document.getElementById("m-tokens").textContent = `${b.input_tokens || 0} / ${b.output_tokens || 0}`;
+      document.getElementById("m-pruned").textContent = `${b.pruned_tokens || 0}`;
+      document.getElementById("m-cleared").textContent = state.raw_rfp_cleared ? "Yes (0 chars)" : "Pending";
+
+      const auditList = document.getElementById("audit-list");
+      const logs = state.audit_log || [];
+      auditBadge.textContent = String(logs.length);
+      auditCount.textContent = `${logs.length} ${logs.length === 1 ? "event" : "events"}`;
+
+      if (!logs.length) {
+        auditList.textContent = "No events recorded yet.";
+      } else {
+        const auditFrag = document.createDocumentFragment();
+        logs.forEach((a) => {
+          const entry = document.createElement("div");
+          entry.className = "audit-entry";
+          const nodeSpan = document.createElement("span");
+          nodeSpan.className = "audit-node";
+          nodeSpan.textContent = `[${a.node}]`;
+          entry.appendChild(nodeSpan);
+          entry.appendChild(document.createTextNode(` ${a.action}: ${a.detail}`));
+          auditFrag.appendChild(entry);
+        });
+        auditList.replaceChildren(auditFrag);
+      }
+    }
+
+    function buildHitlSelect(key, options) {
+      const sel = document.createElement("select");
+      sel.dataset.hitlKey = key;
+      options.forEach(([value, label]) => {
+        const opt = document.createElement("option");
+        opt.value = value;
+        opt.textContent = label;
+        sel.appendChild(opt);
+      });
+      return sel;
+    }
+
+    function renderInterrupt(interrupts) {
+      const first = (interrupts || [])[0];
+      if (!first) {
+        hitlBox.style.display = "none";
+        hitlBox.classList.remove("is-open");
+        return;
+      }
+      const frag = document.createDocumentFragment();
+      (first.discrepancies || []).forEach((d) => {
+        const el = document.createElement("div");
+        el.className = "hitl-item";
+        const desc = document.createElement("div");
+        const label = document.createElement("strong");
+        const friendlyKind = DISCREPANCY_LABELS[d.kind] || d.kind;
+        label.textContent = `${friendlyKind}: `;
+        desc.appendChild(label);
+        appendInlineMarkdown(desc, String(d.details || ""));
+        const sel = buildHitlSelect(d.discrepancy_id, [
+          ["use_closeout", "Use newer closeout sheet"],
+          ["use_crm", "Keep Deltek CRM record"],
+          ["acknowledge", "Acknowledge sync lag"]
+        ]);
+        el.append(desc, sel);
+        frag.appendChild(el);
+      });
+      (first.unverifiable_criteria || []).forEach((u) => {
+        const el = document.createElement("div");
+        el.className = "hitl-item";
+        const desc = document.createElement("div");
+        const label = document.createElement("strong");
+        label.textContent = "Not tracked in CRM (Mandatory): ";
+        desc.appendChild(label);
+        appendInlineMarkdown(desc, `${u.title || ""} — ${u.reason || ""}`);
+        const sel = buildHitlSelect(u.req_id, [
+          ["waive", "Waive / Verified offline (Conditional)"],
+          ["reject", "Reject (Force No-Go)"]
+        ]);
+        el.append(desc, sel);
+        frag.appendChild(el);
+      });
+      hitlItems.replaceChildren(frag);
+      hitlBox.style.display = "flex";
+      hitlBox.classList.add("is-open");
+    }
+
+    const copyTimers = new WeakMap();
+    let lastCopyMessage = "";
+
+    function reportCopy(button, ok) {
+      const tip = button.nextElementSibling;
+      clearTimeout(copyTimers.get(button));
+      button.removeAttribute("data-copied");
+      button.removeAttribute("data-failed");
+      let message = ok ? "Copied" : "Copy failed";
+      if (message === lastCopyMessage) message += "\u00A0";
+      lastCopyMessage = message;
+      tip.textContent = "";
+      void button.offsetWidth;
+      button.setAttribute(ok ? "data-copied" : "data-failed", "");
+      requestAnimationFrame(() => {
+        tip.textContent = message;
+      });
+      copyTimers.set(button, setTimeout(() => {
+        button.removeAttribute("data-copied");
+        button.removeAttribute("data-failed");
+        tip.textContent = "";
+      }, 2000));
+    }
+
+    function legacyCopy(text) {
+      const previousFocus = document.activeElement;
+      const field = Object.assign(document.createElement("textarea"), { value: text });
+      field.setAttribute("readonly", "");
+      field.style.cssText = "position:fixed;inset-block-start:0;opacity:0";
+      document.body.append(field);
+      field.select();
+      try {
+        return document.execCommand("copy");
+      } finally {
+        field.remove();
+        previousFocus?.focus({ preventScroll: true });
+      }
+    }
+
+    async function copyFromTarget(button, target) {
+      const text = target.matches("input, textarea") ? target.value : target.innerText.trim();
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        reportCopy(button, true);
+      } catch {
+        reportCopy(button, legacyCopy(text));
+      }
+    }
+
+    document.addEventListener("command", (event) => {
+      if (event.command.startsWith("--copy") && event.source && event.target) {
+        copyFromTarget(event.source, event.target);
+      }
+    }, true);
+
+    if (!("CommandEvent" in window)) {
+      document.addEventListener("click", (event) => {
+        if (event.defaultPrevented) return;
+        const button = event.target.closest('button[command^="--copy"]');
+        if (!button) return;
+        const target = document.getElementById(button.getAttribute("commandfor"));
+        if (target) copyFromTarget(button, target);
+      });
+    }
+
+    let supportsDisplayTransition;
+    function canTransitionDisplay() {
+      if (supportsDisplayTransition !== undefined) return supportsDisplayTransition;
+      if (!window.CSS?.supports?.("transition-behavior", "allow-discrete") || !document.body) {
+        return false;
+      }
+      const probe = document.createElement("div");
+      probe.style.cssText = "transition: display 1s allow-discrete !important; display: block;";
+      document.body.appendChild(probe);
+      getComputedStyle(probe).display;
+      probe.style.display = "none";
+      supportsDisplayTransition = getComputedStyle(probe).display === "block";
+      probe.remove();
+      return supportsDisplayTransition;
+    }
+
+    function supportsTopLayerExit() {
+      return window.CSS?.supports?.("overlay", "auto") && canTransitionDisplay();
+    }
+
+    async function closeAuditDialog() {
+      if (!auditDialog.open) return;
+      if (!supportsTopLayerExit()) {
+        auditDialog.setAttribute("data-closing", "");
+        const animations = auditDialog.getAnimations({ subtree: true });
+        if (animations.length > 0) {
+          await Promise.race([
+            Promise.allSettled(animations.map((a) => a.finished)),
+            new Promise((r) => setTimeout(r, 400))
+          ]);
+        }
+        if (!auditDialog.hasAttribute("data-closing")) return;
+        auditDialog.removeAttribute("data-closing");
+      }
+      auditDialog.close();
+    }
+
+    async function streamPost(url, payload) {
+      runBtn.disabled = true;
+      resumeBtn.disabled = true;
+      whatifBtn.disabled = true;
+      rfpSelect.disabled = true;
+      wsSelect.disabled = true;
+      liveStatus.textContent = "Starting qualification...";
+      liveStatus.hidden = false;
+      try {
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!resp.ok || !resp.body) {
+          const msg = await resp.text().catch(() => resp.statusText);
+          throw new Error(msg || `HTTP ${resp.status}`);
+        }
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split("\n\n");
+          buffer = parts.pop() || "";
+          for (const block of parts) {
+            const lines = block.split("\n");
+            let evName = "message";
+            let dataRaw = "";
+            for (const line of lines) {
+              if (line.startsWith("event:")) evName = line.slice(6).trim();
+              if (line.startsWith("data:")) dataRaw += line.slice(5).trim();
+            }
+            if (!dataRaw) continue;
+            const data = JSON.parse(dataRaw);
+            if (evName === "node_update") {
+              seenNodes.add(data.node);
+              renderTimeline(data.node, "running");
+              if (data.status_message) {
+                liveStatus.textContent = data.status_message;
+                liveStatus.hidden = false;
+              }
+            } else if (evName === "paused") {
+              liveStatus.textContent = "Paused for human review.";
+              liveStatus.hidden = false;
+              renderTimeline(null, "paused");
+              renderState(data.state);
+              renderInterrupt(data.interrupts);
+            } else if (evName === "complete") {
+              liveStatus.textContent = "";
+              liveStatus.hidden = true;
+              hitlBox.style.display = "none";
+              hitlBox.classList.remove("is-open");
+              renderTimeline(null, "complete");
+              renderState(data.state);
+            } else if (evName === "error") {
+              liveStatus.textContent = "";
+              liveStatus.hidden = true;
+              alert("Qualification error: " + data.message);
+            }
+          }
+        }
+      } catch (err) {
+        liveStatus.textContent = "";
+        liveStatus.hidden = true;
+        alert("Request failed: " + (err?.message || String(err)));
+      } finally {
+        runBtn.disabled = false;
+        resumeBtn.disabled = false;
+        rfpSelect.disabled = false;
+        wsSelect.disabled = false;
+        whatifBtn.disabled = whatifInput.disabled;
+      }
+    }
+
+    function resetQualificationView() {
+      threadId = "ui-" + Math.random().toString(36).slice(2, 9);
+      lastState = null;
+      seenNodes.clear();
+      hitlBox.style.display = "none";
+      hitlBox.classList.remove("is-open");
+      hitlItems.replaceChildren();
+      whatifInput.value = "";
+      whatifInput.disabled = true;
+      whatifBtn.disabled = true;
+      renderWhatIfChips(null);
+
+      verdictBanner.className = "verdict-banner";
+      setVerdictHeadline(document.getElementById("verdict-tag"), null, "Ready to qualify", "");
+      document.getElementById("verdict-conf").textContent = "Ready";
+      verdictCounts.hidden = true;
+      verdictCounts.replaceChildren();
+      assumptionsBar.hidden = true;
+      assumptionsBar.replaceChildren();
+      copyBriefBtn.hidden = true;
+      briefCopySource.value = "";
+      liveStatus.textContent = "";
+      liveStatus.hidden = true;
+      document.getElementById("verdict-summary").textContent = "Select a solicitation on the left and click Qualify pursuit to verify mandatory requirements against firm CRM and closeout records.";
+      renderPreRunOverview();
+
+      document.getElementById("m-calls").textContent = "0 / 0";
+      document.getElementById("m-tokens").textContent = "0 / 0";
+      document.getElementById("m-pruned").textContent = "0";
+      document.getElementById("m-cleared").textContent = "—";
+      auditBadge.textContent = "0";
+      auditCount.textContent = "0 events";
+      document.getElementById("audit-list").textContent = "Waiting for run.";
+      renderTimeline();
+
+      const desk = document.querySelector(".qualification-desk");
+      if (desk) desk.scrollTop = 0;
+    }
+
+    async function init() {
+      renderTimeline();
+      renderWhatIfChips(null);
+      rfps = await fetch("/api/rfps").then((r) => r.json());
+      const frag = document.createDocumentFragment();
+      rfps.forEach((r, i) => {
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        opt.textContent = r.title;
+        frag.appendChild(opt);
+      });
+      rfpSelect.replaceChildren(frag);
+      if (rfps.length) rfpText.value = rfps[0].content;
+      renderRfpPreview();
+      renderPreRunOverview();
+    }
+
+    rfpSelect.addEventListener("change", () => {
+      const item = rfps[Number(rfpSelect.value)];
+      if (item) {
+        rfpText.value = item.content;
+        renderRfpPreview();
+        resetQualificationView();
+      }
+    });
+
+    rfpText.addEventListener("input", () => {
+      renderPreRunOverview();
+    });
+
+    rfpPreviewBtn.addEventListener("click", () => setRfpMode("preview"));
+    rfpEditBtn.addEventListener("click", () => setRfpMode("edit"));
+    rfpPreview.addEventListener("dblclick", () => setRfpMode("edit"));
+
+    auditBtn.addEventListener("click", () => {
+      auditDialog.removeAttribute("data-closing");
+      if (!auditDialog.open) auditDialog.showModal();
+    });
+
+    auditCloseForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      closeAuditDialog();
+    });
+
+    auditDialog.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      closeAuditDialog();
+    });
+
+    if (!("closedBy" in HTMLDialogElement.prototype)) {
+      auditDialog.addEventListener("click", (event) => {
+        if (event.target !== auditDialog) return;
+        const rect = auditDialog.getBoundingClientRect();
+        const inside =
+          rect.top <= event.clientY &&
+          event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX &&
+          event.clientX <= rect.left + rect.width;
+        if (!inside) closeAuditDialog();
+      });
+    }
+
+    resetBtn.addEventListener("click", resetQualificationView);
+
+    runBtn.addEventListener("click", async () => {
+      seenNodes.clear();
+      hitlBox.style.display = "none";
+      hitlBox.classList.remove("is-open");
+      await streamPost(`/api/threads/${threadId}/analyze`, {
+        rfp_text: rfpText.value,
+        workspace_id: wsSelect.value
+      });
+    });
+
+    resumeBtn.addEventListener("click", async () => {
+      const decisions = {};
+      hitlItems.querySelectorAll("select[data-hitl-key]").forEach((sel) => {
+        decisions[sel.dataset.hitlKey] = sel.value;
+      });
+      await streamPost(`/api/threads/${threadId}/resume`, {
+        decisions,
+        workspace_id: wsSelect.value
+      });
+    });
+
+    whatifBtn.addEventListener("click", async () => {
+      const q = whatifInput.value.trim();
+      if (!q) return;
+      seenNodes.clear();
+      await streamPost(`/api/threads/${threadId}/followup`, {
+        followup_input: q,
+        workspace_id: wsSelect.value
+      });
+      whatifInput.value = "";
+    });
+
+    init();
+  </script>
+</body>
+</html>

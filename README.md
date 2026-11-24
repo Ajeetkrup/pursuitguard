@@ -7,6 +7,7 @@
 ![Google GenAI](https://img.shields.io/badge/Google%20GenAI-Gemini%20%2F%20Vertex-0c5a60?style=flat-square)
 ![Tests](https://img.shields.io/badge/Tests-17%20Passed-0d6847?style=flat-square)
 ![Offline Evals](https://img.shields.io/badge/Offline%20Evals-14%2F14%20Passed-0d6847?style=flat-square)
+![Live Evals](https://img.shields.io/badge/Live%20Evals-12%2F14%20Passed-8f4b06?style=flat-square)
 
 > Architecture, Engineering, and Construction (AEC) Go/No-Go pursuit qualification agent powered by a strictly read-only CRM MCP server, sequential stateful LangGraph orchestration, and deterministic guardrails.
 
@@ -57,17 +58,25 @@ flowchart TD
 
 ---
 
-## Verified Evaluation Results (14-Case Offline Suite)
+## Verified Evaluation Results (14-Case Suite: Offline vs. Live)
 
-Evaluated across 14 adversarial and multi-turn cases (`evals/cases.json`) comparing **v1 Baseline** (unstructured narrative search including drafts, exact title join, unpruned raw RFP across turns, no mandatory guard) against **v2 PursuitGuard**:
+Evaluated across 14 adversarial and multi-turn cases (`evals/cases.json`). **Offline** tests deterministic guardrails, SQL CRM math, fuzzy reconciliation, and token pruning with zero LLM variance (`LLM_PROVIDER=mock`); **Live** tests full end-to-end Gemini extraction, MCP tool selection, What-If patching, and summaries (`primary=gemini-4-hydrogen`, `light=gemini-3.5-flash-lite`).
 
-| Metric | v1 Baseline | v2 PursuitGuard | Delta |
+| Metric | v1 Baseline | v2 Offline (Mock) | v2 Live (`gemini-4-hydrogen`) |
 | :--- | :--- | :--- | :--- |
-| End-to-End Case Pass Rate | 28.6% (4/14) | 100.0% (14/14) | +71.4% |
-| Unmatched Entity Freshness Recall | 0.0% (0/3) | 100.0% (3/3) | +100.0% |
-| Security & Mandatory Invariant Pass | 50.0% (1/2) | 100.0% (2/2) | +50.0% |
-| 4-Turn Cumulative Input Tokens | 7040 | 1940 | -72.4% |
-| Post-Pruning Turn-1 Pinned Recall | — | 100.0% | Preserved |
+| End-to-End Case Pass Rate | 28.6% (4/14) | 100.0% (14/14) | 85.7% (12/14) |
+| Unmatched Entity Freshness Recall | 0.0% (0/3) | 100.0% (3/3) | 100.0% (3/3) |
+| Security & Mandatory Invariant Pass | 50.0% (1/2) | 100.0% (2/2) | 100.0% (2/2) |
+| 4-Turn Cumulative Input Tokens | 7,040 | 1,940 (-72.4% vs. v1) | 15,580 in / 2,535 out* |
+| Post-Pruning Turn-1 Pinned Recall | — | 100.0% | 100.0% |
+| Agent Latency (p50 / p95) | — | < 0.12s | 28.24s / 50.58s |
+| Avg Tokens & Est. Cost / Run | — | 0 (`$0.0000`) | 6,149 in / 1,171 out (~`$0.0048`) |
+
+> **Live Mode Notes (12/14 — 2026-11-25):**
+> - **`c06_draft_exclusion_ambulatory` (`forbidden_citation=nar_08`):** Draft records (`nar_06`, `nar_07`, `nar_09`) were excluded, but the live tool planner omitted the `subsector="acute_care"` filter on `search_project_narratives`, allowing a won AZ ambulatory record (`nar_08`) to match alongside TX acute-care hits.
+> - **`c07_bounded_synonym_retry` (`retries=0 < min=1`):** The live model expanded *"telemetry step-down ward"* into broader acute-care terms on the initial pass, hitting on try 1 so the 0-hit synonym retry did not need to fire.
+>
+> *\*Live token counts reflect actual Gemini API `usage_metadata` across structured JSON schemas and system prompts (`11` end-to-end agent cases; `3` entity-resolution cases are deterministic Python). Cost estimates use Flash-tier reference pricing (`$0.30 / 1M` input, `$2.50 / 1M` output).*
 
 ---
 

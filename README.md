@@ -50,8 +50,9 @@ flowchart TD
     PRUNE -->|"All Clear"| SCORE["7. Final Scorecard (Python Guard): Block GO if mandatory fails + Langfuse"]
     HITL -->|"Command(resume=...)"| SCORE
 
-    MCP["Read-Only MCP Server (4 flat tools, ?mode=ro SQLite + FTS5, closure workspace_id)"] -.-> VERIFY
-    MCP -.-> RECONCILE
+    MCP["Read-Only MCP Server (4 flat tools, closure workspace_id)"] -.-> VERIFY
+    STORE["Read-Only SQLite + FTS5 Store (crm.db?mode=ro)"] -.-> MCP
+    STORE -.-> RECONCILE
 ```
 
 ---
@@ -69,29 +70,31 @@ flowchart TD
 
 ## Verified Evaluation Results (14-Case Suite: Offline vs. Live)
 
-Evaluated across 14 adversarial and multi-turn cases (`evals/cases.json`). **Offline** tests deterministic guardrails, SQL CRM math, fuzzy reconciliation, and token pruning with zero LLM variance (`LLM_PROVIDER=mock`); **Live** tests full end-to-end Gemini extraction, MCP tool selection, What-If patching, and summaries (`primary=gemini-4-hydrogen`, `light=gemini-3.5-flash-lite`).
+Evaluated across 14 adversarial and multi-turn cases (`evals/cases.json`). **Offline** tests deterministic guardrails, SQL CRM math, fuzzy reconciliation, and token pruning with zero LLM variance (`LLM_PROVIDER=mock`); **Live** tests full end-to-end Gemini extraction, MCP tool selection, What-If patching, and summaries. `.env.example` defaults to GA `gemini-2.5-flash` for out-of-the-box setup, while the published live run below benchmarked preview models (`primary=gemini-4-hydrogen`, `light=gemini-3.5-flash-lite`) with cost estimated at Gemini Flash reference pricing (`$0.30 / 1M` input, `$2.50 / 1M` output).
 
 | Metric | v1 Baseline | v2 Offline (Mock) | v2 Live (`gemini-4-hydrogen`) |
 | :--- | :--- | :--- | :--- |
 | End-to-End Case Pass Rate | 28.6% (4/14) | 100.0% (14/14) | 85.7% (12/14) |
 | Unmatched Entity Freshness Recall | 0.0% (0/3) | 100.0% (3/3) | 100.0% (3/3) |
 | Security & Mandatory Invariant Pass | 50.0% (1/2) | 100.0% (2/2) | 100.0% (2/2) |
-| 4-Turn Cumulative Input Tokens | 7,040 | 1,940 (-72.4% vs. v1) | 15,580 in / 2,535 out* |
+| 4-Turn Context Payload Tokens (Heuristic) | 7,040 | 1,940 (-72.4% vs. v1) | — |
+| 4-Turn Full API Usage (All Nodes + Schemas) | — | — | 15,580 in / 2,535 out* |
 | Post-Pruning Turn-1 Pinned Recall | — | 100.0% | 100.0% |
 | Agent Latency (p50 / p95) | — | 0.07s / 0.29s | 28.24s / 50.58s |
 | Avg Tokens & Est. Cost / Run | — | 0 (`$0.0000`) | 6,149 in / 1,171 out (~`$0.0048`) |
 
 > **Live Mode Notes (12/14 — 2026-11-25):**
-> - **`c06_draft_exclusion_ambulatory` (`forbidden_citation=nar_08`):** Draft records (`nar_06`, `nar_07`, `nar_09`) were excluded, but the live tool planner omitted the `subsector="acute_care"` filter on `search_project_narratives`, allowing a won AZ ambulatory record (`nar_08`) to match alongside TX acute-care hits.
-> - **`c07_bounded_synonym_retry` (`retries=0 < min=1`):** The live model expanded *"telemetry step-down ward"* into broader acute-care terms on the initial pass, hitting on try 1 so the 0-hit synonym retry did not need to fire.
+> - **`c06_draft_exclusion_ambulatory` (`forbidden_citation=nar_08`, agent planner miss):** Draft records (`nar_06`, `nar_07`, `nar_09`) were excluded, but the live tool planner omitted the `subsector="acute_care"` filter on `search_project_narratives`, allowing a won AZ ambulatory record (`nar_08`) to match alongside TX acute-care hits.
+> - **`c07_bounded_synonym_retry` (`retries=0 < min=1`, strict test assertion — not a model failure):** The live model expanded *"telemetry step-down ward"* into broader acute-care terms and matched on try 1, so the 0-hit synonym retry loop did not need to fire.
+> - **Latency (`28.24s` p50 / `50.58s` p95):** `verify_requirements` checks criteria sequentially to enforce strict per-step token and tool-call caps (while FastAPI SSE streams live step progress to the UI), and `evals/run_evals.py` wraps full multi-turn runs (initial RFP + HITL resume + up to 3 What-If follow-ups) inside a single case timer.
 >
-> *\*Live token counts reflect actual Gemini API `usage_metadata` across structured JSON schemas and system prompts (`11` end-to-end agent cases; `3` entity-resolution cases are deterministic Python). Cost estimates use Flash-tier reference pricing (`$0.30 / 1M` input, `$2.50 / 1M` output).*
+> *\*Live token counts reflect actual Gemini API `usage_metadata` across system prompts and structured JSON schemas (`11` end-to-end agent cases; `3` entity-resolution cases are deterministic Python).*
 
 ---
 
 ## Quickstart (3 Commands)
 
-```powershell
+```bash
 uv sync
 uv run python data/seed_crm.py
 uv run uvicorn src.api.app:app --reload
@@ -112,7 +115,7 @@ Copy `.env.example` to `.env` and choose a live inference option (leave `LLM_PRO
 
 Run live evaluations:
 
-```powershell
+```bash
 uv run python evals/run_evals.py --mode live
 ```
 
@@ -126,6 +129,15 @@ Run the stdio MCP server directly (`uv run python -m src.mcp_server.server`) to 
 - `check_staff_credentials` — Verifies active vs. expired professional licenses (`PE`, `SE`, etc.) by state.
 - `get_client_history` — Retrieves past pursuit win/loss history and debrief notes for a client/agency.
 - `search_project_narratives` — Read-only FTS5 BM25 (plus optional cached RRF) search over closeout and scope narratives with draft exclusion.
+
+---
+
+## Production Trade-offs & Next Steps
+
+- **ERP & Document Connector Swap:** Keep the exact 4 flat read-only MCP tool contracts (`query_projects`, `check_staff_credentials`, `get_client_history`, `search_project_narratives`) while swapping the local SQLite store for read-only Deltek Vantagepoint, Unanet, or SharePoint adapters.
+- **Bounded Parallel Verification:** Replace sequential per-criterion verification in `verify_requirements` with bounded `asyncio.gather` concurrency to cut multi-criteria p50/p95 latency while preserving token/tool-call caps and SSE progress events.
+- **Deterministic Post-Tool Filtering (`c06` Hardening):** Enforce extracted `state` and `subsector` constraints deterministically inside `_evaluate_tool_outcome` on `search_project_narratives` results so omitted planner filters cannot admit out-of-scope citations.
+- **Retry-Loop Eval Calibration (`c07`):** Update the `c07` fixture to use an obscure internal code or acronym where pass 1 reliably yields 0 hits, ensuring live runs directly exercise the bounded synonym-retry path.
 
 ---
 
@@ -159,7 +171,7 @@ pursuitguard/
 
 ## Development & Verification
 
-```powershell
+```bash
 uv run ruff check src tests evals data
 uv run pytest -v
 uv run python evals/run_evals.py --mode offline

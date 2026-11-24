@@ -11,6 +11,9 @@
 
 > Architecture, Engineering, and Construction (AEC) Go/No-Go pursuit qualification agent powered by a strictly read-only CRM MCP server, sequential stateful LangGraph orchestration, and deterministic guardrails.
 
+https://github.com/user-attachments/assets/cc33c80b-f852-423c-9b36-f6d19eaa45a2
+
+
 ![PursuitGuard Bid/No-Bid Qualification Desk](docs/ui-preview.png)
 
 ---
@@ -24,6 +27,7 @@ Evaluating a new AEC solicitation (*"≥3 acute-care hospitals over 50,000 sq ft
 3. **Unchecked Agent Autonomy:** Without read-only tool boundaries, workspace isolation, token caps, and human checkpoints, agents can burn tokens, leak restricted defense records, or emit `GO` over failed mandatory disqualifiers.
 
 ---
+
 
 ## Architecture
 

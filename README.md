@@ -69,7 +69,7 @@ Evaluated across 14 adversarial and multi-turn cases (`evals/cases.json`). **Off
 | Security & Mandatory Invariant Pass | 50.0% (1/2) | 100.0% (2/2) | 100.0% (2/2) |
 | 4-Turn Cumulative Input Tokens | 7,040 | 1,940 (-72.4% vs. v1) | 15,580 in / 2,535 out* |
 | Post-Pruning Turn-1 Pinned Recall | — | 100.0% | 100.0% |
-| Agent Latency (p50 / p95) | — | < 0.12s | 28.24s / 50.58s |
+| Agent Latency (p50 / p95) | — | 0.07s / 0.29s | 28.24s / 50.58s |
 | Avg Tokens & Est. Cost / Run | — | 0 (`$0.0000`) | 6,149 in / 1,171 out (~`$0.0048`) |
 
 > **Live Mode Notes (12/14 — 2026-11-25):**

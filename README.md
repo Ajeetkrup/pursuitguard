@@ -11,10 +11,15 @@
 
 > Architecture, Engineering, and Construction (AEC) Go/No-Go pursuit qualification agent powered by a strictly read-only CRM MCP server, sequential stateful LangGraph orchestration, and deterministic guardrails.
 
+### ▶ Watch the 3-Minute Walkthrough (with Voiceover)
+
+> **0:00** Texas Water (`Go` + Human Review on stale CRM data) · **1:24** California Courthouse (`No-Go` license blocker + What-If `Conditional Go`) · **2:34** Read-only MCP & Audit Drawer
+
 https://github.com/user-attachments/assets/cc33c80b-f852-423c-9b36-f6d19eaa45a2
 
+### Bid / No-Bid Qualification Desk — Go vs. No-Go Verdicts
 
-![PursuitGuard Bid/No-Bid Qualification Desk](docs/ui-preview.png)
+![PursuitGuard Go vs. No-Go Qualification Verdicts](docs/ui-preview.png)
 
 ---
 

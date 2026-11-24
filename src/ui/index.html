@@ -2461,7 +2461,6 @@
       const evMap = state.evidence_by_id || {};
 
       verdictBanner.className = "verdict-banner is-updated";
-      renderCountPills(pinned, evMap, state.discrepancies || [], state.hitl_decisions || {});
 
       if (state.what_if_assumptions?.length) {
         assumptionsBar.textContent = "";
@@ -2476,6 +2475,12 @@
       }
 
       if (sc) {
+        if (sc.verdict === "HITL_REQUIRED") {
+          verdictCounts.hidden = true;
+          verdictCounts.replaceChildren();
+        } else {
+          renderCountPills(pinned, evMap, state.discrepancies || [], state.hitl_decisions || {});
+        }
         const meta = VERDICT_META[sc.verdict] || { icon: "clock", label: sc.verdict };
         verdictBanner.classList.add("banner-" + sc.verdict);
         setVerdictHeadline(vTag, meta.icon, meta.label, "v-" + sc.verdict);
@@ -2503,6 +2508,8 @@
         whatifInput.disabled = false;
         whatifBtn.disabled = false;
       } else {
+        verdictCounts.hidden = true;
+        verdictCounts.replaceChildren();
         verdictBanner.classList.add("banner-HITL_REQUIRED");
         setVerdictHeadline(vTag, VERDICT_META.HITL_REQUIRED.icon, VERDICT_META.HITL_REQUIRED.label, "v-HITL_REQUIRED");
         vConf.textContent = "Awaiting sign-off";
